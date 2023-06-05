@@ -1,6 +1,6 @@
 from pygame import *
 from random import randint
-
+#Добавить счётчик побед игрока и бота
 finish = True
 win_widht = 700
 win_height = 500
