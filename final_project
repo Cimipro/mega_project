@@ -1,21 +1,42 @@
 from pygame import *
 from random import randint
-#Добавить счётчик побед игрока и бота
+from time import sleep
+yes_v = False
+variant_player = 4
 finish = True
-win_widht = 700
-win_height = 500
+win_widht = 1200
+win_height = 700
 game = True
 clock = time.Clock()
 FPS = 60
+counter = 0
 get_mouse_pos = 0
 font.init()
 font1 = font.SysFont('Arial',80)
-win = font1.render('YOU WIN',True,(255,255,255))
-lose = font1.render('YOU LOSE', True,(255,255,255))
-draw = font1.render('DRAW', True,(255,255,255))
+win = font1.render('Ты победил',True,(16,255,1))
+lose = font1.render('Ты проиграл', True,(255,16,0))
+draw = font1.render('Ничья', True,(233,255,1))
+one = font1.render('A -', True,(255,255,255))
+two = font1.render('S -', True,(255,255,255))
+three = font1.render('D -', True,(255,255,255))
+
+font2 = font.SysFont('Arial',36)
+
+r_b = font1.render('Бот кинул камень', True,(255,255,255))
+p_b = font1.render('Бот кинул бумагу ', True,(255,255,255))
+k_b = font1.render('Бот кинул ножницы', True,(255,255,255))
+
+r_p = font1.render('Ты кинул камень', True,(255,255,255))
+p_p = font1.render('Ты кинул бумага', True,(255,255,255))
+k_p = font1.render('Ты кинул ножницы', True,(255,255,255))
+
+restart_key = font1.render('R - рестарт', True,(255,255,255))
+
+#game_counter = font2.render('Счёт '+str(counter),1,(255,255,255))
+
 #Создание окна игры
 window = display.set_mode((win_widht, win_height))
-display.set_caption("Пинг-понг")
+display.set_caption("Камень Ножницы Бумага ")
 background = transform.scale(image.load('background.jpg'), (win_widht, win_height))
 
 class GameSprite(sprite.Sprite):
@@ -33,41 +54,63 @@ class GameSprite(sprite.Sprite):
     def reset(self):
         window.blit(self.image, (self.rect.x, self.rect.y))
     
-    def update_rock(self):
-        keys = key.get_pressed()
-        if keys[K_s]:
-            variant_player = 1
-            return variant_player
+    #def update_rock(self):
+    #   keys = key.get_pressed()
+    #    if keys[K_s]:
+    #        variant_player = 1
+    #        return variant_player
 
-    def update_paper(self):
-        keys = key.get_pressed()
-        if keys[K_a]:
-            variant_player = 2
-            return variant_player
+    #def update_paper(self):
+    #    keys = key.get_pressed()
+    #    if keys[K_a]:
+    #        variant_player = 2
+    #        return variant_player
 
-    def update_knife(self):
-        keys = key.get_pressed()
-        if keys[K_d]:
-            variant_player = 3
-            return variant_player
+    #def update_knife(self):
+    #    keys = key.get_pressed()
+    #    if keys[K_d]:
+    #        variant_player = 3
+    #        return variant_player
 
 
 # if self.rect.x == get_mouse_pos and self.rect.y == get_mouse_pos:
 #Экземпляры классов
-rock = GameSprite('asteroid.png', 400, 200, 65, 80, 10,2)
-paper = GameSprite('asteroid.png', 400, 100, 65, 80, 10,2)
-knife = GameSprite('asteroid.png', 400, 300, 65, 80, 10,2)
+rock = GameSprite('rock.png', 400, 200, 80, 80, 10,2)
+paper = GameSprite('paper.png', 400, 100, 80, 80, 10,2)
+knife = GameSprite('scissors.png', 400, 300, 80, 80, 10,2)
 while game:
     # Сделать завешение игры по нажатию крестика
     for e in event.get():
         if e.type == QUIT:
             game = False
-            
-    if finish or lose !=1:
+        elif e.type == KEYDOWN:
+            if e.key == K_a:
+                #Камень
+                variant_player = 1
+                yes_v = True
+            if e.key == K_s:
+                #Бумага
+                variant_player = 2
+                yes_v = True
+                #Ножници
+            if e.key == K_d:
+                variant_player = 3
+                yes_v = True
+            if e.key == K_r:
+                finish = True
+    if finish:
         window.blit(background, (0, 0))
-        rock.update_rock()
-        paper.update_paper()
-        knife.update_knife()
+        #Бумага
+        window.blit(one, (310, 100))
+        #Камень
+        window.blit(two, (310, 200))
+        #Ножници
+        window.blit(three, (310, 300))
+        #Кнопка рестарта  
+        window.blit(restart_key, (330, 500))
+
+        game_counter = font2.render('Счёт '+str(counter),1,(255,255,255))
+        window.blit(game_counter, (800,0))
 
         rock.reset()
         paper.reset()
@@ -75,29 +118,67 @@ while game:
         variant_robot = randint(1,3)
 
         #Тут будет происходить сравнение с ботом
-        if variant_player == 1:
-            if variant_robot == 1:
-                window.blit(draw, (0, 0))
-            if variant_robot == 2:
-                window.blit(lose, (0, 0))
-            if variant_robot == 3:
-                window.blit(win, (0, 0))
+        if yes_v:
+            #Камень
+            if variant_player == 1:
+                window.blit(r_p, (600, 200))
+                #Камень
+                if variant_robot == 1:
+                    window.blit(r_b, (600, 350))
+                    window.blit(draw, (10, 0))
+                    finish = False
+                #Бумага
+                if variant_robot == 2:
+                    window.blit(p_b, (600, 350))
+                    window.blit(lose, (10, 0))
+                    finish = False
+                #Ножници
+                if variant_robot == 3:
+                    window.blit(k_b, (600, 350))
+                    window.blit(win, (10, 0))
+                    finish = False
+                    counter +=1
+            #Бумага
+            
+            if variant_player == 2:
+                window.blit(p_p, (600, 200))
+                #Камень
+                if variant_robot == 1:
+                    window.blit(r_b, (600,350))
+                    window.blit(win, (10, 0))
+                    finish = False
+                    counter +=1
+                #Бумага
+                if variant_robot == 2:
+                    window.blit(p_b, (600, 350))
+                    window.blit(draw, (10, 0))
+                    finish = False
+                #Ножници
+                if variant_robot == 3:
+                    window.blit(k_b, (600, 350))
+                    window.blit(lose, (10, 0))
+                    finish = False
+            #Ножницы
+            if variant_player == 3:
+                window.blit(k_p, (600, 200))
+                #Камень
+                if variant_robot == 1:
+                    window.blit(r_b, (600, 350))
+                    window.blit(lose, (10, 0))
+                    finish = False
+                #Бумага
+                if variant_robot == 2:
+                    window.blit(p_b, (600, 350))
+                    window.blit(win, (10, 0))
+                    finish = False
+                    counter +=1
+                #Ножницы
+                if variant_robot == 3:
+                    window.blit(k_b, (600, 350))
+                    window.blit(draw, (10, 0))
+                    finish = False
 
-        if variant_player == 2:
-            if variant_robot == 1:
-                window.blit(win, (0, 0))
-            if variant_robot == 2:
-                window.blit(draw, (0, 0))
-            if variant_robot == 3:
-                window.blit(lose, (0, 0))
-
-        if variant_player == 3:
-            if variant_robot == 1:
-                window.blit(lose, (0, 0))
-            if variant_robot == 2:
-                window.blit(win, (0, 0))
-            if variant_robot == 3:
-                window.blit(draw, (0, 0))
-        
+            yes_v = False
+            print(variant_player)
     display.update()
     time.delay(FPS)
